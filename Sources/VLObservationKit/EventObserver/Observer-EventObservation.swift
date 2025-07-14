@@ -13,7 +13,7 @@ extension VLstack.EventsObservation
   private(set) var cloudKitHasChanged: String = ""
 
   @ObservationIgnored
-  internal var subjects: [ String : PassthroughSubject<PROPERTY, Never> ] = [:]
+  internal var subjects: [ String : PassthroughSubject<PROPERTY?, Never> ] = [:]
 
   @ObservationIgnored
   internal var globalSubject = PassthroughSubject<VLstack.EventsObservation.Notifications, Never>()
@@ -58,12 +58,12 @@ extension VLstack.EventsObservation
    cancellables.removeAll()
   }
 
-  internal func getPublisher(_ event: EVENT?) -> PassthroughSubject<PROPERTY, Never>
+  internal func getPublisher(_ event: EVENT?) -> PassthroughSubject<PROPERTY?, Never>
   {
    guard let event
    else
    {
-    let subject = PassthroughSubject<PROPERTY, Never>()
+    let subject = PassthroughSubject<PROPERTY?, Never>()
     subject.send(completion: .finished)
     return subject
    }
@@ -75,13 +75,13 @@ extension VLstack.EventsObservation
     return subject
    }
 
-   let subject = PassthroughSubject<PROPERTY, Never>()
+   let subject = PassthroughSubject<PROPERTY?, Never>()
    subjects[identifier] = subject
 
    return subject
   }
 
-  public func listen(_ event: EVENT?) -> AnyPublisher<PROPERTY, Never>
+  public func listen(_ event: EVENT?) -> AnyPublisher<PROPERTY?, Never>
   {
    getPublisher(event).eraseToAnyPublisher()
   }
@@ -123,7 +123,10 @@ extension VLstack.EventsObservation
    guard let payload = notification.userInfo?["payload"] as? VLstack.EventsObservation.Payload<EVENT, PROPERTY>
    else { return }
 
-   getPublisher(payload.event).send(payload.property)
+   // Value of optional type 'PROPERTY?' must be unwrapped to a value of type 'PROPERTY'
+   let property: PROPERTY? = payload.property
+   let publisher: PassthroughSubject<PROPERTY?, Never> = getPublisher(payload.event)
+   publisher.send(property)
   }
  }
 }

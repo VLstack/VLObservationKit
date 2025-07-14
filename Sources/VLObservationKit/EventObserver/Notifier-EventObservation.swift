@@ -11,7 +11,7 @@ extension VLstack.EventsObservation
   }
 
   internal func resolve(event: EVENT,
-                       property: PROPERTY,
+                       property: PROPERTY?,
                        seen: inout Set<EVENT>) async -> [ VLstack.EventsObservation.Payload<EVENT, PROPERTY> ]
   {
    guard seen.insert(event).inserted else { return [] }
@@ -22,7 +22,7 @@ extension VLstack.EventsObservation
    for relatedEvent in event.relatedEvents
    {
     let toAdd = await resolve(event: relatedEvent,
-                              property: property,
+                              property: nil,
                               seen: &seen)
     result.append(contentsOf: toAdd)
    }
