@@ -10,5 +10,6 @@ extension VLstack.EventsObservation
 
  public protocol ObservableProperty: Identifiable, Equatable, Hashable, Sendable
  {
+  var allowRelatedPropagation: Bool { get }
  }
 }

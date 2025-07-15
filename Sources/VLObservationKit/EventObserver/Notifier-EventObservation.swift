@@ -19,6 +19,12 @@ extension VLstack.EventsObservation
    var result: [ VLstack.EventsObservation.Payload<EVENT, PROPERTY> ] = []
 
    result.append(.init(event: event, property: property))
+
+   if property?.allowRelatedPropagation == false
+   {
+    return result
+   }
+
    for relatedEvent in event.relatedEvents
    {
     let toAdd = await resolve(event: relatedEvent,
