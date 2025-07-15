@@ -31,7 +31,7 @@ extension VLstack.EventsObservation
   }
 
   public func dispatch(_ event: EVENT,
-                       _ property: PROPERTY) async
+                       _ property: PROPERTY?) async
   {
    var seen: Set<EVENT> = []
    let resolved = await resolve(event: event,
