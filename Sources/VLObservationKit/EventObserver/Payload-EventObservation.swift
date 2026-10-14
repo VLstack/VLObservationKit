@@ -1,8 +1,7 @@
-import VLstackNamespace
-
-extension VLstack.EventsObservation
+// TODO: supprimer le suffixe -EventObservation du fichier
+extension VLEventsObservation
 {
- public struct Payload<EVENT: VLstack.EventsObservation.ObservableEvent, PROPERTY: VLstack.EventsObservation.ObservableProperty>: Sendable
+ public struct Payload<EVENT: VLEventsObservation.ObservableEvent, PROPERTY: VLEventsObservation.ObservableProperty>: Sendable
  {
   public let event: EVENT
   public let property: PROPERTY?

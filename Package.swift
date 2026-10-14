@@ -11,12 +11,7 @@ let package = Package(name: "VLObservationKit",
                        .library(name: "VLObservationKit",
                                 targets: ["VLObservationKit"])
                       ],
-                      dependencies:
-                      [
-                       .package(url: "https://github.com/VLstack/VLstackNamespace", from: "1.2.0")
-                      ],
                       targets:
                       [
-                       .target(name: "VLObservationKit",
-                               dependencies: [ "VLstackNamespace" ])
+                       .target(name: "VLObservationKit")
                       ])

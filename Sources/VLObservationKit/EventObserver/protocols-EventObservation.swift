@@ -1,6 +1,5 @@
-import VLstackNamespace
-
-extension VLstack.EventsObservation
+// TODO: supprimer le suffixe -EventObservation du fichier
+extension VLEventsObservation
 {
  public protocol ObservableEvent: Identifiable, Equatable, Hashable, Sendable where ID == String
  {

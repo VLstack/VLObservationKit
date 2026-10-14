@@ -1,13 +1,13 @@
-import VLstackNamespace
+// TODO: supprimer le suffixe -EventObservation du fichier
 import Observation
 import SwiftData
 import CoreData
 import Combine
 
-extension VLstack.EventsObservation
+extension VLEventsObservation
 {
  @Observable
- public final class Observer<EVENT: VLstack.EventsObservation.ObservableEvent, PROPERTY: VLstack.EventsObservation.ObservableProperty>
+ public final class Observer<EVENT: VLEventsObservation.ObservableEvent, PROPERTY: VLEventsObservation.ObservableProperty>
  {
   private(set) var modelContextHasChanged: String = ""
   private(set) var cloudKitHasChanged: String = ""
@@ -16,7 +16,7 @@ extension VLstack.EventsObservation
   internal var subjects: [ String : PassthroughSubject<PROPERTY?, Never> ] = [:]
 
   @ObservationIgnored
-  internal var globalSubject = PassthroughSubject<VLstack.EventsObservation.Notifications, Never>()
+  internal var globalSubject = PassthroughSubject<VLEventsObservation.Notifications, Never>()
 
   @ObservationIgnored
   internal var cancellables = Set<AnyCancellable>()
@@ -31,17 +31,17 @@ extension VLstack.EventsObservation
 
    NotificationCenter.default.addObserver(self,
                                           selector: #selector(onCloudKit(notification:)),
-                                          name: VLstack.EventsObservation.Notifications.cloudKit.name,
+                                          name: VLEventsObservation.Notifications.cloudKit.name,
                                           object: nil)
 
    NotificationCenter.default.addObserver(self,
                                           selector: #selector(onContext(notification:)),
-                                          name: VLstack.EventsObservation.Notifications.context.name,
+                                          name: VLEventsObservation.Notifications.context.name,
                                           object: nil)
 
    NotificationCenter.default.addObserver(self,
                                           selector: #selector(onObservable(notification:)),
-                                          name: VLstack.EventsObservation.Notifications.observable.name,
+                                          name: VLEventsObservation.Notifications.observable.name,
                                           object: nil)
   }
 
@@ -120,7 +120,7 @@ extension VLstack.EventsObservation
   @objc
   internal func onObservable(notification: Notification)
   {
-   guard let payload = notification.userInfo?["payload"] as? VLstack.EventsObservation.Payload<EVENT, PROPERTY>
+   guard let payload = notification.userInfo?["payload"] as? VLEventsObservation.Payload<EVENT, PROPERTY>
    else { return }
 
    // Value of optional type 'PROPERTY?' must be unwrapped to a value of type 'PROPERTY'

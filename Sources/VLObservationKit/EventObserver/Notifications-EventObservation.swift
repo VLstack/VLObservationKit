@@ -1,8 +1,8 @@
-import VLstackNamespace
+// TODO: supprimer le suffixe -EventObservation du fichier
 import Foundation
 import CoreData
 
-extension VLstack.EventsObservation
+extension VLEventsObservation
 {
  internal enum Notifications: String
  {

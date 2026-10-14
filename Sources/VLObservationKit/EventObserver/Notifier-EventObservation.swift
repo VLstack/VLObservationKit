@@ -1,10 +1,10 @@
-import VLstackNamespace
+// TODO: supprimer le suffixe -EventObservation du fichier
 import Foundation
 import CoreData
 
-extension VLstack.EventsObservation
+extension VLEventsObservation
 {
- public final actor Notifier<EVENT: VLstack.EventsObservation.ObservableEvent, PROPERTY: VLstack.EventsObservation.ObservableProperty>
+ public final actor Notifier<EVENT: VLEventsObservation.ObservableEvent, PROPERTY: VLEventsObservation.ObservableProperty>
  {
   public init()
   {
@@ -12,11 +12,11 @@ extension VLstack.EventsObservation
 
   internal func resolve(event: EVENT,
                        property: PROPERTY?,
-                       seen: inout Set<EVENT>) async -> [ VLstack.EventsObservation.Payload<EVENT, PROPERTY> ]
+                       seen: inout Set<EVENT>) async -> [ VLEventsObservation.Payload<EVENT, PROPERTY> ]
   {
    guard seen.insert(event).inserted else { return [] }
 
-   var result: [ VLstack.EventsObservation.Payload<EVENT, PROPERTY> ] = []
+   var result: [ VLEventsObservation.Payload<EVENT, PROPERTY> ] = []
 
    result.append(.init(event: event, property: property))
 
@@ -48,7 +48,7 @@ extension VLstack.EventsObservation
     var affectsModelContext: Bool = false
     for payload in resolved
     {
-     NotificationCenter.default.post(name: VLstack.EventsObservation.Notifications.observable.name,
+     NotificationCenter.default.post(name: VLEventsObservation.Notifications.observable.name,
                                      object: nil,
                                      userInfo: [ "payload": payload ])
      affectsModelContext = affectsModelContext || payload.event.affectsModelContext
@@ -56,7 +56,7 @@ extension VLstack.EventsObservation
 
     if affectsModelContext
     {
-     NotificationCenter.default.post(name: VLstack.EventsObservation.Notifications.context.name,
+     NotificationCenter.default.post(name: VLEventsObservation.Notifications.context.name,
                                      object: nil)
     }
    }
