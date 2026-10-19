@@ -10,8 +10,6 @@ enum TestEvent: VLEventsObservation.ObservableEvent
 
  var id: String { String(describing: self) }
 
- var affectsModelContext: Bool { true }
-
  var relatedEvents: Set<TestEvent>
  {
   switch self

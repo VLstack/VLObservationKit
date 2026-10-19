@@ -1,5 +1,4 @@
 import Foundation
-import CoreData
 
 extension VLEventsObservation
 {
@@ -32,12 +31,6 @@ extension VLEventsObservation
    return result
   }
 
-  public func dispatch(_ event: EVENT,
-                       _ property: PROPERTY?) async
-  {
-   await dispatch([ .init(event: event, property: property) ])
-  }
-
   // Envoi groupé : un événement atteint par plusieurs payloads (par exemple .recipes) n'est envoyé qu'une fois
   internal func resolve(_ payloads: [ VLEventsObservation.Payload<EVENT, PROPERTY> ]) async -> [ VLEventsObservation.Payload<EVENT, PROPERTY> ]
   {
@@ -54,25 +47,23 @@ extension VLEventsObservation
    return resolved
   }
 
+  public func dispatch(_ event: EVENT,
+                       _ property: PROPERTY?) async
+  {
+   await dispatch([ .init(event: event, property: property) ])
+  }
+
   public func dispatch(_ payloads: [ VLEventsObservation.Payload<EVENT, PROPERTY> ]) async
   {
    let resolved = await resolve(payloads)
 
    await MainActor.run
    {
-    var affectsModelContext: Bool = false
     for payload in resolved
     {
      NotificationCenter.default.post(name: VLEventsObservation.Notifications.observable.name,
                                      object: nil,
                                      userInfo: [ "payload": payload ])
-     affectsModelContext = affectsModelContext || payload.event.affectsModelContext
-    }
-
-    if affectsModelContext
-    {
-     NotificationCenter.default.post(name: VLEventsObservation.Notifications.context.name,
-                                     object: nil)
     }
    }
   }

@@ -1,44 +1,17 @@
-// TODO: supprimer le suffixe -EventObservation du fichier
-import Observation
-import SwiftData
-import CoreData
 import Combine
+import Foundation
+import Observation
 
 extension VLEventsObservation
 {
  @Observable
  public final class Observer<EVENT: VLEventsObservation.ObservableEvent, PROPERTY: VLEventsObservation.ObservableProperty>
  {
-  private(set) var modelContextHasChanged: String = ""
-  private(set) var cloudKitHasChanged: String = ""
-
   @ObservationIgnored
   internal var subjects: [ String : PassthroughSubject<PROPERTY?, Never> ] = [:]
 
-  @ObservationIgnored
-  internal var globalSubject = PassthroughSubject<VLEventsObservation.Notifications, Never>()
-
-  @ObservationIgnored
-  internal var cancellables = Set<AnyCancellable>()
-
-  @ObservationIgnored
-  internal let debounceQueue = DispatchQueue(label: "fr.vlstack.VLObservationKit.EventsObservation.debouncedQueue",
-                                            qos: .userInitiated)
-
   public init()
   {
-   setupDebouncedUpdates()
-
-   NotificationCenter.default.addObserver(self,
-                                          selector: #selector(onCloudKit(notification:)),
-                                          name: VLEventsObservation.Notifications.cloudKit.name,
-                                          object: nil)
-
-   NotificationCenter.default.addObserver(self,
-                                          selector: #selector(onContext(notification:)),
-                                          name: VLEventsObservation.Notifications.context.name,
-                                          object: nil)
-
    NotificationCenter.default.addObserver(self,
                                           selector: #selector(onObservable(notification:)),
                                           name: VLEventsObservation.Notifications.observable.name,
@@ -54,8 +27,6 @@ extension VLEventsObservation
     subject.send(completion: .finished)
    }
    subjects.removeAll()
-   globalSubject.send(completion: .finished)
-   cancellables.removeAll()
   }
 
   internal func getPublisher(_ event: EVENT?) -> PassthroughSubject<PROPERTY?, Never>
@@ -65,6 +36,7 @@ extension VLEventsObservation
    {
     let subject = PassthroughSubject<PROPERTY?, Never>()
     subject.send(completion: .finished)
+
     return subject
    }
 
@@ -84,37 +56,6 @@ extension VLEventsObservation
   public func listen(_ event: EVENT?) -> AnyPublisher<PROPERTY?, Never>
   {
    getPublisher(event).eraseToAnyPublisher()
-  }
-
-  internal func setupDebouncedUpdates()
-  {
-   globalSubject
-    .collect(.byTime(self.debounceQueue, .milliseconds(50)))
-    .receive(on: DispatchQueue.main)
-    .sink
-    {
-     [weak self] changes in
-     guard let self else { return }
-
-     let uuid = UUID().uuidString
-     let set = Set(changes)
-
-     if set.contains(.context) { self.modelContextHasChanged = uuid }
-     if set.contains(.cloudKit) { self.cloudKitHasChanged = uuid }
-    }
-    .store(in: &cancellables)
-  }
-
-  @objc
-  internal func onCloudKit(notification: Notification)
-  {
-   self.globalSubject.send(.cloudKit)
-  }
-
-  @objc
-  internal func onContext(notification: Notification)
-  {
-   self.globalSubject.send(.context)
   }
 
   @objc

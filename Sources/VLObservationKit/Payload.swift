@@ -1,4 +1,3 @@
-// TODO: supprimer le suffixe -EventObservation du fichier
 extension VLEventsObservation
 {
  public struct Payload<EVENT: VLEventsObservation.ObservableEvent, PROPERTY: VLEventsObservation.ObservableProperty>: Sendable

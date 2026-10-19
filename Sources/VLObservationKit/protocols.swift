@@ -1,9 +1,7 @@
-// TODO: supprimer le suffixe -EventObservation du fichier
 extension VLEventsObservation
 {
  public protocol ObservableEvent: Identifiable, Equatable, Hashable, Sendable where ID == String
  {
-  var affectsModelContext: Bool { get }
   var relatedEvents: Set<Self> { get }
  }
 
