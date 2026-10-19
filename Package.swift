@@ -13,5 +13,7 @@ let package = Package(name: "VLObservationKit",
                       ],
                       targets:
                       [
-                       .target(name: "VLObservationKit")
+                       .target(name: "VLObservationKit"),
+                       .testTarget(name: "VLObservationKitTests",
+                                   dependencies: [ "VLObservationKit" ])
                       ])

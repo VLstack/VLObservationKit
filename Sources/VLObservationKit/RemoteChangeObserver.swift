@@ -58,7 +58,17 @@ extension VLEventsObservation
   // Ecriture de l'app elle-même : déjà signalée par ses ModelManager
   private func isLocal(_ transaction: DefaultHistoryTransaction) -> Bool
   {
-   transaction.author == nil && transaction.bundleIdentifier == bundleIdentifier
+   Self.isLocal(author: transaction.author,
+                transactionBundleIdentifier: transaction.bundleIdentifier,
+                appBundleIdentifier: bundleIdentifier)
+  }
+
+  // Un import CloudKit porte l'auteur "NSCloudKitMirroringDelegate.import", un widget écrit depuis un autre bundle
+  internal static func isLocal(author: String?,
+                               transactionBundleIdentifier: String,
+                               appBundleIdentifier: String?) -> Bool
+  {
+   author == nil && transactionBundleIdentifier == appBundleIdentifier
   }
 
   private func readHistory() async

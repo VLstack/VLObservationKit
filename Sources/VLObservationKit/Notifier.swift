@@ -39,7 +39,7 @@ extension VLEventsObservation
   }
 
   // Envoi groupé : un événement atteint par plusieurs payloads (par exemple .recipes) n'est envoyé qu'une fois
-  public func dispatch(_ payloads: [ VLEventsObservation.Payload<EVENT, PROPERTY> ]) async
+  internal func resolve(_ payloads: [ VLEventsObservation.Payload<EVENT, PROPERTY> ]) async -> [ VLEventsObservation.Payload<EVENT, PROPERTY> ]
   {
    var seen: Set<EVENT> = []
    var resolved: [ VLEventsObservation.Payload<EVENT, PROPERTY> ] = []
@@ -50,6 +50,13 @@ extension VLEventsObservation
                               seen: &seen)
     resolved.append(contentsOf: toAdd)
    }
+
+   return resolved
+  }
+
+  public func dispatch(_ payloads: [ VLEventsObservation.Payload<EVENT, PROPERTY> ]) async
+  {
+   let resolved = await resolve(payloads)
 
    await MainActor.run
    {
