@@ -1,4 +1,3 @@
-// TODO: supprimer le suffixe -EventObservation du fichier
 import Foundation
 import CoreData
 
@@ -6,9 +5,7 @@ extension VLEventsObservation
 {
  public final actor Notifier<EVENT: VLEventsObservation.ObservableEvent, PROPERTY: VLEventsObservation.ObservableProperty>
  {
-  public init()
-  {
-  }
+  public init() {}
 
   internal func resolve(event: EVENT,
                        property: PROPERTY?,
@@ -17,7 +14,6 @@ extension VLEventsObservation
    guard seen.insert(event).inserted else { return [] }
 
    var result: [ VLEventsObservation.Payload<EVENT, PROPERTY> ] = []
-
    result.append(.init(event: event, property: property))
 
    if property?.allowRelatedPropagation == false
@@ -39,10 +35,22 @@ extension VLEventsObservation
   public func dispatch(_ event: EVENT,
                        _ property: PROPERTY?) async
   {
+   await dispatch([ .init(event: event, property: property) ])
+  }
+
+  // Envoi groupé : un événement atteint par plusieurs payloads (par exemple .recipes) n'est envoyé qu'une fois
+  public func dispatch(_ payloads: [ VLEventsObservation.Payload<EVENT, PROPERTY> ]) async
+  {
    var seen: Set<EVENT> = []
-   let resolved = await resolve(event: event,
-                                property: property,
-                                seen: &seen)
+   var resolved: [ VLEventsObservation.Payload<EVENT, PROPERTY> ] = []
+   for payload in payloads
+   {
+    let toAdd = await resolve(event: payload.event,
+                              property: payload.property,
+                              seen: &seen)
+    resolved.append(contentsOf: toAdd)
+   }
+
    await MainActor.run
    {
     var affectsModelContext: Bool = false
