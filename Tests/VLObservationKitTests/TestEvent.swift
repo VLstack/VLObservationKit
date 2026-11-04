@@ -1,6 +1,6 @@
 @testable import VLObservationKit
 
-// Graphe de test : a → b → c → a (cycle), d → c ; un seul événement lié par cas pour garder un ordre fixe
+// Test graph: a → b → c → a (cycle), d → c; one related event per case to keep a fixed order
 enum TestEvent: VLEventsObservation.ObservableEvent
 {
  case a

@@ -75,4 +75,16 @@ struct CloudKitImportObserverTests
   try await waitPastDelay()
   #expect(observer.isImporting)
  }
+
+ @Test("The same import started twice ends with a single end")
+ func sameImportStartedTwice() async throws
+ {
+  let observer = makeObserver()
+  let identifier = UUID()
+  observer.handleImport(identifier: identifier, isEnd: false)
+  observer.handleImport(identifier: identifier, isEnd: false)
+  observer.handleImport(identifier: identifier, isEnd: true)
+  try await waitPastDelay()
+  #expect(!observer.isImporting)
+ }
 }

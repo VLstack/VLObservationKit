@@ -30,6 +30,13 @@ func cycleStops() async
  #expect(resolved.map(\.event) == [ .c, .a, .b ])
 }
 
+@Test("A chain of related events is followed to the end")
+func chainIsFollowed() async
+{
+ let resolved = await TestNotifier().resolve([ .init(event: .d, property: .propagate) ])
+ #expect(resolved.map(\.event) == [ .d, .c, .a, .b ])
+}
+
 @Test("Batch: a related event shared by two payloads is sent once")
 func batchSendsSharedEventOnce() async
 {
@@ -45,6 +52,16 @@ func batchKeepsFirstPayload() async
                                                .init(event: .a, property: .stop) ])
  #expect(resolved.map(\.event) == [ .a, .b, .c ])
  #expect(resolved.first?.property == .propagate)
+}
+
+// NOTE: documents the current rule, the property of the second payload is lost
+@Test("Batch: an event already reached as a related event keeps nil")
+func batchRelatedEventKeepsNil() async
+{
+ let resolved = await TestNotifier().resolve([ .init(event: .a, property: .propagate),
+                                               .init(event: .b, property: .stop) ])
+ #expect(resolved.map(\.event) == [ .a, .b, .c ])
+ #expect(resolved.map(\.property) == [ .propagate, nil, nil ])
 }
 
 @Test("Empty batch: nothing")

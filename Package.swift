@@ -3,17 +3,26 @@
 
 import PackageDescription
 
+let swiftSettings: [ SwiftSetting ] =
+[
+ .enableUpcomingFeature("ApproachableConcurrency"),
+ .enableUpcomingFeature("MemberImportVisibility"),
+ .enableUpcomingFeature("ExistentialAny")
+]
+
 let package = Package(name: "VLObservationKit",
                       defaultLocalization: "en",
                       platforms: [ .macOS(.v15), .iOS(.v18) ],
                       products:
                       [
                        .library(name: "VLObservationKit",
-                                targets: ["VLObservationKit"])
+                                targets: [ "VLObservationKit" ])
                       ],
                       targets:
                       [
-                       .target(name: "VLObservationKit"),
+                       .target(name: "VLObservationKit",
+                               swiftSettings: swiftSettings),
                        .testTarget(name: "VLObservationKitTests",
-                                   dependencies: [ "VLObservationKit" ])
+                                   dependencies: [ "VLObservationKit" ],
+                                   swiftSettings: swiftSettings)
                       ])
