@@ -87,4 +87,64 @@ struct CloudKitImportObserverTests
   try await waitPastDelay()
   #expect(!observer.isImporting)
  }
+
+ // MARK: - hasCompletedFirstImport
+
+ @Test("hasCompletedFirstImport is false at start")
+ func firstImportFalseAtStart()
+ {
+  let observer = makeObserver()
+  #expect(!observer.hasCompletedFirstImport)
+ }
+
+ @Test("An import start alone keeps hasCompletedFirstImport false")
+ func firstImportFalseWhileImporting() async throws
+ {
+  let observer = makeObserver()
+  observer.handleImport(identifier: UUID(), isEnd: false)
+  try await waitPastDelay()
+  #expect(!observer.hasCompletedFirstImport)
+ }
+
+ @Test("An import end sets hasCompletedFirstImport at once, without the delay")
+ func firstImportSetAtEnd()
+ {
+  let observer = makeObserver()
+  let identifier = UUID()
+  observer.handleImport(identifier: identifier, isEnd: false)
+  observer.handleImport(identifier: identifier, isEnd: true)
+  #expect(observer.hasCompletedFirstImport)
+  #expect(observer.isImporting)
+ }
+
+ @Test("A failed setup sets hasCompletedFirstImport")
+ func failedSetupSetsFirstImport()
+ {
+  let observer = makeObserver()
+  observer.handleSetupEnd(succeeded: false)
+  #expect(observer.hasCompletedFirstImport)
+  #expect(!observer.isImporting)
+ }
+
+ @Test("A successful setup keeps hasCompletedFirstImport false")
+ func successfulSetupKeepsFirstImport()
+ {
+  let observer = makeObserver()
+  observer.handleSetupEnd(succeeded: true)
+  #expect(!observer.hasCompletedFirstImport)
+ }
+
+ @Test("hasCompletedFirstImport never goes back to false")
+ func firstImportStaysTrue() async throws
+ {
+  let observer = makeObserver()
+  let first = UUID()
+  observer.handleImport(identifier: first, isEnd: false)
+  observer.handleImport(identifier: first, isEnd: true)
+  observer.handleImport(identifier: UUID(), isEnd: false)
+  observer.handleSetupEnd(succeeded: true)
+  try await waitPastDelay()
+  #expect(observer.hasCompletedFirstImport)
+  #expect(observer.isImporting)
+ }
 }
